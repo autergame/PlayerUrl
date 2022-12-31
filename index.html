@@ -24,8 +24,6 @@
 
 	let video_code = btoa(video.src.substring(video.src.length - 8, video.src.length));
 
-	let lastSecond = null;
-
 	video.addEventListener('loadeddata', function (e) {
 		if (e.target.readyState >= 3) {
 			let init_value = localStorage.getItem(video_code);
@@ -36,16 +34,8 @@
 				ev.target.currentTime = value == '' ? 0 : value;
 			});
 
-			video.addEventListener('pause', function (ev) {
-				localStorage.setItem(video_code, Math.floor(ev.target.currentTime))
-			});
-
 			video.addEventListener('timeupdate', function (ev) {
-				var seconds = Math.floor(ev.target.currentTime)
-				if ((seconds % 10) == 0 && lastSecond !== seconds) {
-					localStorage.setItem(video_code, seconds);
-					lastSecond = seconds;
-				}
+				localStorage.setItem(video_code, Math.floor(ev.target.currentTime));
 			});
 		}
 	});
