@@ -13,10 +13,42 @@
 
 <body>
 	<video controls="controls" id="player" autoplay="autoplay" loop="loop" width="100%" height="100%" src=""></video>
-	<script>
-		let params = new URLSearchParams(document.location.search);
-		document.getElementById("player").src = decodeURIComponent(params.get("url"));
-	</script>
 </body>
+
+<script>
+	let params = new URLSearchParams(document.location.search);
+
+	let video = document.querySelector('#player');
+
+	video.src = decodeURIComponent(params.get("url"));
+
+	let video_code = btoa(video.src.substring(video.src.length - 8, video.src.length));
+
+	let lastSecond = null;
+
+	video.addEventListener('loadeddata', function (e) {
+		if (e.target.readyState >= 3) {
+			let init_value = localStorage.getItem(video_code);
+			e.target.currentTime = init_value == '' ? 0 : init_value;
+
+			video.addEventListener('play', function (ev) {
+				let value = localStorage.getItem(video_code);
+				ev.target.currentTime = value == '' ? 0 : value;
+			});
+
+			video.addEventListener('pause', function (ev) {
+				localStorage.setItem(video_code, Math.floor(ev.target.currentTime))
+			});
+
+			video.addEventListener('timeupdate', function (ev) {
+				var seconds = Math.floor(ev.target.currentTime)
+				if ((seconds % 10) == 0 && lastSecond !== seconds) {
+					localStorage.setItem(video_code, seconds);
+					lastSecond = seconds;
+				}
+			});
+		}
+	});
+</script>
 
 </html>
