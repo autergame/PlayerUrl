@@ -12,14 +12,13 @@
 </head>
 
 <body>
-	<video id="player" controls autoplay loop width="100%" height="100%" src=""></video>
+	<video id="player" controls loop width="100%" height="100%" src=""></video>
 </body>
 
 <script>
 	let params = new URLSearchParams(document.location.search);
 
 	let video = document.querySelector('#player');
-
 	video.src = decodeURIComponent(params.get("url"));
 
 	let video_code = btoa(video.src.substring(video.src.length - 8, video.src.length));
@@ -28,14 +27,15 @@
 		if (e.target.readyState >= 3) {
 			let init_value = localStorage.getItem(video_code);
 			e.target.currentTime = init_value == '' ? 0 : init_value;
+			e.target.play();
 
-			video.addEventListener('play', function (ev) {
-				let value = localStorage.getItem(video_code);
-				ev.target.currentTime = value == '' ? 0 : value;
-			});
-
+			let lastSeconds = null;
 			video.addEventListener('timeupdate', function (ev) {
-				localStorage.setItem(video_code, Math.floor(ev.target.currentTime));
+				let seconds = Math.floor(ev.target.currentTime);
+				if ((seconds % 5) == 0 && seconds != lastSeconds) {
+					localStorage.setItem(video_code, seconds);
+					lastSeconds = seconds;
+				}
 			});
 		}
 	});
