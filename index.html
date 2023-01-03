@@ -19,25 +19,49 @@
 	let params = new URLSearchParams(document.location.search);
 
 	let video = document.querySelector('#player');
-	video.src = decodeURIComponent(params.get("url"));
+	video.src = params.get("url");
 
-	let video_code = btoa(video.src.substring(video.src.length - 8, video.src.length));
+	let video_code = btoa(video.src.substring(Math.max(video.src.length - 16, 0), video.src.length));
 
-	video.addEventListener('loadeddata', function (e) {
-		if (e.target.readyState >= 3) {
-			let init_value = localStorage.getItem(video_code);
-			e.target.currentTime = init_value == '' ? 0 : init_value;
-			e.target.play();
+	video.addEventListener("canplaythrough", async function video_func() {
+		let subtitles = params.get("subtitles");
+		if (subtitles != null) {
+			let track = document.createElement("track");
+			track.srclang = params.get("subtitles_srclang");
+			track.label = params.get("subtitles_label");
+			track.kind = "subtitles";
+			track.mode = "showing";
+			track.default = true;
 
-			let lastSeconds = null;
-			video.addEventListener('timeupdate', function (ev) {
-				let seconds = Math.floor(ev.target.currentTime);
-				if ((seconds % 5) == 0 && seconds != lastSeconds) {
-					localStorage.setItem(video_code, seconds);
-					lastSeconds = seconds;
-				}
+			let response = await fetch(subtitles);
+			let data = await response.text();
+			let vtt_blob = new Blob([data], {
+				type: 'text/plain'
 			});
+			track.src = URL.createObjectURL(vtt_blob);
+
+			video.appendChild(track);
+			video.textTracks[0].mode = "showing";
 		}
+
+		let init_value = localStorage.getItem(video_code);
+		if (init_value != "") {
+			video.currentTime = init_value;
+		} else {
+			video.autoplay = true;
+		}
+		video.play();
+
+		video.removeEventListener('canplaythrough', video_func);
+
+		let lastSeconds = null;
+		video.addEventListener("timeupdate", function () {
+			let seconds = Math.floor(video.currentTime);
+			if ((seconds % 5) == 0 && seconds != lastSeconds) {
+				localStorage.setItem(video_code, seconds);
+				lastSeconds = seconds;
+			}
+		});
 	});
 </script>
 
