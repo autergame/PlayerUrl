@@ -1,62 +1,77 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+	<link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+	<link href="https://cdn.jsdelivr.net/npm/videojs-seek-buttons/dist/videojs-seek-buttons.css" rel="stylesheet" />
 	<style>
 		body {
 			margin: 0px;
+			overflow: hidden;
 			background-color: black;
+		}
+
+		.video-js {
+			width: 100%;
+			height: 100%;
 		}
 	</style>
 </head>
 
 <body>
-	<video id="player" controls loop width="100%" height="100%" src=""></video>
+	<video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered" controls loop src=""></video>
+	<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/videojs-seek-buttons/dist/videojs-seek-buttons.min.js"></script>
 </body>
 
 <script>
 	let params = new URLSearchParams(document.location.search);
 
-	let video = document.querySelector('#player');
-	video.src = params.get("url");
+	let video_src = params.get("url");
 
-	let video_code = btoa(video.src.substring(Math.max(video.src.length - 16, 0), video.src.length));
-
-	video.addEventListener("canplaythrough", async function video_func() {
-		let subtitles = params.get("subtitles");
-		if (subtitles != null) {
-			let track = document.createElement("track");
-			track.srclang = params.get("subtitles_srclang");
-			track.label = params.get("subtitles_label");
-			track.kind = "subtitles";
-			track.mode = "showing";
-			track.default = true;
-
-			let response = await fetch(subtitles);
-			let data = await response.text();
-			let vtt_blob = new Blob([data], {
-				type: 'text/plain'
-			});
-			track.src = URL.createObjectURL(vtt_blob);
-
-			video.appendChild(track);
-			video.textTracks[0].mode = "showing";
+	var player = videojs("my-player", {
+		html5: {
+			nativeTextTracks: false
 		}
+	});
 
+	player.src({
+		type: 'video/mp4',
+		src: video_src,
+	});
+
+	player.seekButtons({
+		forward: 30,
+		back: 10,
+	});
+
+	let subtitles_src = params.get("subtitles");
+	if (subtitles_src != null) {
+		player.addRemoteTextTrack({
+			default: true,
+			mode: 'showing',
+			kind: "captions",
+			src: subtitles_src,
+			label: params.get("subtitles_label"),
+			srclang: params.get("subtitles_srclang"),
+		}, false);
+	}
+
+	let video_code = btoa(video_src.substring(Math.max(video_src.length - 16, 0), video_src.length));
+
+	player.ready(function () {
 		let init_value = localStorage.getItem(video_code);
 		if (init_value != "") {
-			video.currentTime = init_value;
+			player.currentTime(init_value);
 		} else {
-			video.autoplay = true;
+			player.autoplay(true);
 		}
-		video.play();
-
-		video.removeEventListener('canplaythrough', video_func);
+		player.play();
 
 		let lastSeconds = null;
-		video.addEventListener("timeupdate", function () {
-			let seconds = Math.floor(video.currentTime);
+		player.on("timeupdate", function () {
+			let seconds = Math.floor(player.currentTime());
 			if ((seconds % 5) == 0 && seconds != lastSeconds) {
 				localStorage.setItem(video_code, seconds);
 				lastSeconds = seconds;
