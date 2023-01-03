@@ -28,7 +28,7 @@
 <script>
 	let params = new URLSearchParams(document.location.search);
 
-	let video_src = params.get("url");
+	let video_src = decodeURIComponent(params.get("url"));
 
 	var player = videojs("my-player", {
 		html5: {
@@ -46,15 +46,15 @@
 		back: 10,
 	});
 
-	let subtitles_src = params.get("subtitles");
+	let subtitles_src = decodeURIComponent(params.get("subtitles"));
 	if (subtitles_src != null) {
 		player.addRemoteTextTrack({
 			default: true,
 			mode: 'showing',
 			kind: "captions",
 			src: subtitles_src,
-			label: params.get("subtitles_label"),
-			srclang: params.get("subtitles_srclang"),
+			label: decodeURIComponent(params.get("subtitles_label")),
+			srclang: decodeURIComponent(params.get("subtitles_srclang")),
 		}, false);
 	}
 
