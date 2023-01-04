@@ -16,6 +16,14 @@
 			width: 100%;
 			height: 100%;
 		}
+
+		.vjs-time-divider,
+		.video-js .vjs-duration,
+		.vjs-no-flex .vjs-duration,
+		.video-js .vjs-current-time,
+		.vjs-no-flex .vjs-current-time {
+			display: block;
+		}
 	</style>
 </head>
 
@@ -33,6 +41,17 @@
 	let video_src = decodeURIComponent(params.get("url"));
 
 	var player = videojs("my-player", {
+		controlBar: {
+			children: [
+				"playToggle", 
+				"volumePanel", 
+				"currentTimeDisplay", 
+				"progressControl", 
+				"durationDisplay", 
+				"subsCapsButton", 
+				"fullscreenToggle",
+			],
+		},
 		html5: {
 			nativeTextTracks: false
 		},
