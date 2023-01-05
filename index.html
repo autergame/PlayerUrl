@@ -31,6 +31,7 @@
 	<video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered" controls loop src=""></video>
 </body>
 
+<script src="pt-BR.js"></script>
 <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 <script src="https://cdn.sc.gl/videojs-hotkeys/latest/videojs.hotkeys.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/videojs-seek-buttons/dist/videojs-seek-buttons.min.js"></script>
@@ -40,25 +41,32 @@
 
 	let video_src = decodeURIComponent(params.get("url"));
 
+	videojs.addLanguage('pt-BR', ptBR);
+
 	var player = videojs("my-player", {
 		controlBar: {
 			children: [
-				"playToggle", 
-				"volumePanel", 
-				"currentTimeDisplay", 
-				"progressControl", 
-				"durationDisplay", 
-				"subsCapsButton", 
+				"playToggle",
+				"volumePanel",
+				"currentTimeDisplay",
+				"progressControl",
+				"durationDisplay",
+				"subsCapsButton",
 				"fullscreenToggle",
 			],
+			volumePanel: {
+				inline: false
+			}
 		},
+		language: "pt-BR",
+		persistTextTrackSettings: true,
 		html5: {
 			nativeTextTracks: false
 		},
 		plugins: {
 			hotkeys: {
-				volumeStep: 0.1,
 				seekStep: 10,
+				volumeStep: 0.05,
 				enableModifiersForNumbers: false
 			},
 		},
@@ -92,9 +100,8 @@
 		let init_value = localStorage.getItem(video_code);
 		if (init_value != "") {
 			player.currentTime(init_value);
-		} else {
-			player.autoplay(true);
 		}
+		player.autoplay(true);
 		player.play();
 
 		let lastSeconds = null;
