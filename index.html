@@ -82,13 +82,13 @@
 		back: 10,
 	});
 
-	let subtitles_src = decodeURIComponent(params.get("subtitles"));
+	let subtitles_src = params.get("subtitles");
 	if (subtitles_src != null) {
 		player.addRemoteTextTrack({
 			default: true,
 			mode: 'showing',
 			kind: "captions",
-			src: subtitles_src,
+			src: decodeURIComponent(subtitles_src),
 			label: decodeURIComponent(params.get("subtitles_label")),
 			srclang: decodeURIComponent(params.get("subtitles_srclang")),
 		}, false);
