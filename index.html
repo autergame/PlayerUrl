@@ -1,6 +1,7 @@
 <html>
 
 <head>
+	<title>PlayerUrl</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
 	<link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
@@ -39,9 +40,9 @@
 <script>
 	let params = new URLSearchParams(document.location.search);
 
-	let video_src = decodeURIComponent(params.get("url"));
+	let videoSrc = decodeURIComponent(params.get("url"));
 
-	videojs.addLanguage('pt-BR', ptBR);
+	videojs.addLanguage("pt-BR", ptBR);
 
 	var player = videojs("my-player", {
 		controlBar: {
@@ -73,8 +74,8 @@
 	});
 
 	player.src({
-		type: 'video/mp4',
-		src: video_src,
+		type: "video/mp4",
+		src: videoSrc,
 	});
 
 	player.seekButtons({
@@ -82,25 +83,31 @@
 		back: 10,
 	});
 
-	let subtitles_src = params.get("subtitles");
-	if (subtitles_src != null) {
+	let subtitlesSrc = params.get("subtitles");
+	if (subtitlesSrc != null) {
 		player.addRemoteTextTrack({
 			default: true,
-			mode: 'showing',
+			mode: "showing",
 			kind: "captions",
-			src: decodeURIComponent(subtitles_src),
+			src: decodeURIComponent(subtitlesSrc),
 			label: decodeURIComponent(params.get("subtitles_label")),
 			srclang: decodeURIComponent(params.get("subtitles_srclang")),
 		}, false);
 	}
 
-	let video_code = btoa(video_src.substring(Math.max(video_src.length - 16, 0), video_src.length));
+	let videoCode = btoa(videoSrc.substring(Math.max(videoSrc.length - 16, 0), videoSrc.length));
 
 	player.ready(function () {
-		let init_value = localStorage.getItem(video_code);
-		if (init_value != "") {
-			player.currentTime(init_value);
+		let time = params.get("time");
+		if (time != null) {
+			player.currentTime(time);
+		} else {
+			let initValue = localStorage.getItem(videoCode);
+			if (initValue != "") {
+				player.currentTime(initValue);
+			}
 		}
+
 		player.autoplay(true);
 		player.play();
 
@@ -108,7 +115,13 @@
 		player.on("timeupdate", function () {
 			let seconds = Math.floor(player.currentTime());
 			if ((seconds % 5) == 0 && seconds != lastSeconds) {
-				localStorage.setItem(video_code, seconds);
+				if (time != null) {
+					let newUrl = new URL(location.href);
+					newUrl.searchParams.delete("time");
+					window.history.replaceState({}, document.title, newUrl.href);
+					time = null;
+				}
+				localStorage.setItem(videoCode, seconds);
 				lastSeconds = seconds;
 			}
 		});
