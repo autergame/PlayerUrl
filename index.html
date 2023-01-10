@@ -101,13 +101,25 @@
 
 	let videoCode = btoa(videoSrc.substring(Math.max(videoSrc.length - 16, 0), videoSrc.length));
 
+	let tempos = JSON.parse(localStorage.getItem("Tempos"));
+	if (tempos == null) {
+		tempos = new Object();
+	}
+
 	player.ready(function () {
 		let time = params.get("time");
 		if (time != null) {
 			player.currentTime(time);
+
+			tempos[videoCode] = time;
+			localStorage.setItem("Tempos", JSON.stringify(tempos));
+
+			let newUrl = new URL(location.href);
+			newUrl.searchParams.delete("time");
+			window.history.replaceState({}, document.title, newUrl.href);
 		} else {
-			let initValue = localStorage.getItem(videoCode);
-			if (initValue != "") {
+			let initValue = tempos[videoCode];
+			if (initValue != null) {
 				player.currentTime(initValue);
 			}
 		}
@@ -119,14 +131,9 @@
 		player.on("timeupdate", function () {
 			let seconds = Math.floor(player.currentTime());
 			if ((seconds % 5) == 0 && seconds != lastSeconds) {
-				if (time != null) {
-					let newUrl = new URL(location.href);
-					newUrl.searchParams.delete("time");
-					window.history.replaceState({}, document.title, newUrl.href);
-					time = null;
-				}
-				localStorage.setItem(videoCode, seconds);
 				lastSeconds = seconds;
+				tempos[videoCode] = seconds;
+				localStorage.setItem("Tempos", JSON.stringify(tempos));
 			}
 		});
 	});
