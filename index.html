@@ -111,7 +111,7 @@
 		if (time != null) {
 			player.currentTime(time);
 
-			tempos[videoCode] = time;
+			tempos[videoCode] = Math.floor(parseFloat(time));
 			localStorage.setItem("Tempos", JSON.stringify(tempos));
 
 			let newUrl = new URL(location.href);
