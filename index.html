@@ -37,6 +37,10 @@
 		.video-js .vjs-load-progress div {
 			background: rgb(130, 190, 210);
 		}
+
+		.vjs-error .vjs-error-display:before {
+			display: none !important;
+		}
 	</style>
 </head>
 
@@ -144,6 +148,13 @@
 				localStorage.setItem("Tempos", JSON.stringify(tempos));
 			}
 		});
+	});
+
+	player.on("error", function () {
+		document.getElementById("my-player").className += " vjs-waiting";
+		setTimeout(function () {
+			document.location.reload(true);
+		}, 2000);
 	});
 </script>
 
