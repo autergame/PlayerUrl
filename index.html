@@ -113,9 +113,9 @@
 
 	let videoCode = btoa(videoSrc.substring(Math.max(videoSrc.length - 16, 0), videoSrc.length));
 
-	let tempos = JSON.parse(localStorage.getItem("Tempos"));
-	if (tempos == null) {
-		tempos = new Object();
+	let timestamps = JSON.parse(localStorage.getItem("Timestamps"));
+	if (timestamps == null) {
+		timestamps = new Object();
 	}
 
 	player.ready(function () {
@@ -123,17 +123,22 @@
 		if (time != null) {
 			player.currentTime(time);
 
-			tempos[videoCode] = Math.floor(parseFloat(time));
-			localStorage.setItem("Tempos", JSON.stringify(tempos));
+			timestamps[videoCode] = parseInt(time);
+			localStorage.setItem("Timestamps", JSON.stringify(timestamps));
 
 			let newUrl = new URL(location.href);
 			newUrl.searchParams.delete("time");
 			window.history.replaceState({}, document.title, newUrl.href);
 		} else {
-			let initValue = tempos[videoCode];
+			let initValue = timestamps[videoCode];
 			if (initValue != null) {
 				player.currentTime(initValue);
 			}
+		}
+
+		let volume = localStorage.getItem("Volume");
+		if (volume != null) {
+			player.volume(volume * 0.01);
 		}
 
 		player.autoplay(true);
@@ -144,17 +149,21 @@
 			let seconds = Math.floor(player.currentTime());
 			if ((seconds % 5) == 0 && seconds != lastSeconds) {
 				lastSeconds = seconds;
-				tempos[videoCode] = seconds;
-				localStorage.setItem("Tempos", JSON.stringify(tempos));
+				timestamps[videoCode] = seconds;
+				localStorage.setItem("Timestamps", JSON.stringify(timestamps));
 			}
 		});
-	});
 
-	player.on("error", function () {
-		document.getElementById("my-player").className += " vjs-waiting";
-		setTimeout(function () {
-			document.location.reload(true);
-		}, 2000);
+		player.on("volumechange", () => {
+			localStorage.setItem("Volume", Math.floor(player.volume() * 100));
+		});
+
+		player.on("error", function () {
+			document.getElementById("my-player").className += " vjs-waiting";
+			setTimeout(function () {
+				document.location.reload(true);
+			}, 2000);
+		});
 	});
 </script>
 
