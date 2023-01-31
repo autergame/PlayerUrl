@@ -141,6 +141,12 @@
 			player.volume(volume * 0.01);
 		}
 
+		let fullscreen = localStorage.getItem("Fullscreen");
+		if (fullscreen != null) {
+			player.requestFullscreen();
+			localStorage.removeItem("Fullscreen");
+		}
+
 		player.autoplay(true);
 		player.play();
 
@@ -161,6 +167,9 @@
 		player.on("error", function () {
 			document.getElementById("my-player").className += " vjs-waiting";
 			setTimeout(function () {
+				if (player.isFullscreen()) {
+					localStorage.setItem("Fullscreen", true);
+				}
 				document.location.reload(true);
 			}, 2000);
 		});
