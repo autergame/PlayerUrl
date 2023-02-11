@@ -48,19 +48,13 @@
 	<video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered" controls loop src=""></video>
 </body>
 
-<script src="dist/js/pt-BR.js"></script>
 <script src="dist/js/videojs.min.js"></script>
-<script src="dist/js/videojs.hotkeys.min.js"></script>
 <script src="dist/js/videojs-seek-buttons.min.js"></script>
+<script src="dist/js/videojs.hotkeys.min.js"></script>
+<script src="dist/js/pt-BR.js"></script>
 
 <script>
-	let params = new URLSearchParams(document.location.search);
-
-	let videoSrc = decodeURIComponent(params.get("url"));
-
-	videojs.addLanguage("pt-BR", ptBR);
-
-	var player = videojs("my-player", {
+	let player = videojs("my-player", {
 		controlBar: {
 			children: [
 				"playToggle",
@@ -87,17 +81,21 @@
 				volumeStep: 0.05,
 				enableModifiersForNumbers: false
 			},
+			seekButtons: {
+				forward: 10,
+				back: 10
+			}
 		},
 	});
 
-	player.src({
-		type: "video/mp4",
-		src: videoSrc,
-	});
+	let params = new URLSearchParams(document.location.search);
 
-	player.seekButtons({
-		forward: 10,
-		back: 10,
+	let videoSrc = decodeURIComponent(params.get("url"));
+	let mimeType = decodeURIComponent(params.get("type"));
+
+	player.src({
+		type: mimeType,
+		src: videoSrc,
 	});
 
 	let subtitlesSrc = params.get("subtitles");
@@ -158,7 +156,7 @@
 				setTimeout(function () {
 					player.pause();
 					player.muted(false);
-				}, 30);
+				}, 20);
 			}
 		}, 10000);
 
