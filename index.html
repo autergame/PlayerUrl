@@ -154,15 +154,6 @@
 		player.autoplay(true);
 		player.play();
 
-		setInterval(function () {
-			if (player.paused()) {
-				player.muted(true);
-				player.play();
-				player.pause();
-				player.muted(false);
-			}
-		}, 15000);
-
 		let lastSeconds = null;
 		player.on("timeupdate", function () {
 			let seconds = Math.floor(player.currentTime());
