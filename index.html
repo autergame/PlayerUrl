@@ -103,6 +103,10 @@
 		src: videoSrc,
 	});
 
+	player.reloadSourceOnError({
+		errorInterval: 5,
+	});
+
 	let subtitlesSrc = params.get("subtitles");
 	if (subtitlesSrc != null) {
 		player.addRemoteTextTrack({
@@ -145,12 +149,6 @@
 			player.volume(volume * 0.01);
 		}
 
-		let fullscreen = localStorage.getItem("Fullscreen");
-		if (fullscreen != null) {
-			player.requestFullscreen();
-			localStorage.removeItem("Fullscreen");
-		}
-
 		player.autoplay(true);
 		player.play();
 
@@ -166,16 +164,6 @@
 
 		player.on("volumechange", () => {
 			localStorage.setItem("Volume", Math.floor(player.volume() * 100));
-		});
-
-		player.on("error", function () {
-			document.getElementById("my-player").className += " vjs-waiting";
-			setTimeout(function () {
-				if (player.isFullscreen()) {
-					localStorage.setItem("Fullscreen", true);
-				}
-				document.location.reload(true);
-			}, 2000);
 		});
 	});
 </script>
