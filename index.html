@@ -104,6 +104,12 @@
 	});
 
 	player.reloadSourceOnError({
+		getSource: function (reload) {
+			reload({
+				type: type,
+				src: link,
+			});
+		},
 		errorInterval: 5,
 	});
 
