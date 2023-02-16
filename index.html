@@ -106,8 +106,8 @@
 	player.reloadSourceOnError({
 		getSource: function (reload) {
 			reload({
-				type: type,
-				src: link,
+				type: mimeType,
+				src: videoSrc,
 			});
 		},
 		errorInterval: 5,
