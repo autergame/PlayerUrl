@@ -8,15 +8,15 @@
 	<link href="dist/css/video-js.css" rel="stylesheet" />
 	<style>
 		body {
-			margin: 0px;
+			margin: 0;
 			overflow: hidden;
 			background-color: black;
 		}
 
 		.video-js {
+			border: 0;
 			width: 100%;
 			height: 100%;
-			border: 0px;
 			outline: none;
 			box-shadow: none;
 			outline-style: none;
@@ -44,7 +44,7 @@
 		}
 
 		.vjs-error .vjs-error-display:before {
-			display: none !important;
+			display: none;
 		}
 	</style>
 </head>
@@ -98,20 +98,31 @@
 	let videoSrc = decodeURIComponent(params.get("url"));
 	let mimeType = decodeURIComponent(params.get("type"));
 
-	player.src({
-		type: mimeType,
-		src: videoSrc,
-	});
+	if (mimeType != "null") {
+		player.src({
+			type: mimeType,
+			src: videoSrc,
+		});
 
-	player.reloadSourceOnError({
-		getSource: function (reload) {
-			reload({
-				type: mimeType,
-				src: videoSrc,
-			});
-		},
-		errorInterval: 5,
-	});
+		player.reloadSourceOnError({
+			getSource: function (reload) {
+				reload({
+					type: mimeType,
+					src: videoSrc,
+				});
+			},
+			errorInterval: 5,
+		});
+	} else {
+		player.src(videoSrc);
+
+		player.reloadSourceOnError({
+			getSource: function (reload) {
+				reload(videoSrc);
+			},
+			errorInterval: 5,
+		});
+	}
 
 	let subtitlesSrc = params.get("subtitles");
 	if (subtitlesSrc != null) {
