@@ -4,19 +4,24 @@
 	<title>PlayerUrl</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-	<link href="dist/css/videojs-seek-buttons.css" rel="stylesheet" />
-	<link href="dist/css/video-js.css" rel="stylesheet" />
+
+	<link href="dist/css/video-js.min.css" rel="stylesheet" />
+
 	<style>
 		body {
 			margin: 0;
+			padding: 0;
 			overflow: hidden;
 			background-color: black;
 		}
 
 		.video-js {
-			border: 0;
 			width: 100%;
 			height: 100%;
+		}
+
+		.video-js:focus {
+			border: 0;
 			outline: none;
 			box-shadow: none;
 			outline-style: none;
@@ -46,6 +51,29 @@
 		.vjs-error .vjs-error-display:before {
 			display: none;
 		}
+
+		.vjs-playback-rate .vjs-menu {
+			::-webkit-scrollbar {
+				width: 0;
+			}
+		}
+
+		.video-js .vjs-time-control {
+			min-width: 1em;
+			font-size: 1.2em;
+			line-height: 2.5em;
+			padding-left: 0.5em;
+			padding-right: 0.5em;
+		}
+
+		.vjs-playback-rate .vjs-playback-rate-value {
+			font-size: 1.2em;
+			line-height: 2.4;
+		}
+
+		.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+			max-height: none;
+		}
 	</style>
 </head>
 
@@ -53,8 +81,7 @@
 	<video id="my-player" class="video-js vjs-default-skin vjs-big-play-centered" controls loop src=""></video>
 </body>
 
-<script src="dist/js/videojs.min.js"></script>
-<script src="dist/js/videojs-seek-buttons.min.js"></script>
+<script src="dist/js/video.min.js"></script>
 <script src="dist/js/videojs.hotkeys.min.js"></script>
 <script src="dist/js/pt-BR.js"></script>
 
@@ -63,34 +90,46 @@
 		controlBar: {
 			children: [
 				"playToggle",
+				"skipBackward",
+				"skipForward",
 				"volumePanel",
 				"currentTimeDisplay",
 				"progressControl",
 				"durationDisplay",
+				"playbackRateMenuButton",
 				"subsCapsButton",
 				"PictureInPictureToggle",
 				"fullscreenToggle",
 			],
 			volumePanel: {
 				inline: false
+			},
+			skipButtons: {
+				forward: 10,
+				backward: 10
 			}
+		},
+		userActions: {
+			doubleClick: false
 		},
 		language: "pt-BR",
 		persistTextTrackSettings: true,
 		html5: {
-			nativeTextTracks: false
+			vhs: {
+				overrideNative: true
+			},
+			nativeTextTracks: false,
+			nativeAudioTracks: false,
+			nativeVideoTracks: false
 		},
 		plugins: {
 			hotkeys: {
 				seekStep: 10,
 				volumeStep: 0.05,
 				enableModifiersForNumbers: false
-			},
-			seekButtons: {
-				forward: 10,
-				back: 10
 			}
 		},
+		playbackRates: [2, 1.75, 1.5, 1.25, 1, 0.75, 0.5, 0.25],
 	});
 
 	let params = new URLSearchParams(document.location.search);
